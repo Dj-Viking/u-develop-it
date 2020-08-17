@@ -52,27 +52,38 @@ app.get('/api/candidate/:id', (req, res) => {
     console.log(row);
   });
 });
-//DELETE a candidate
-//using es5 function so we can make this refer to the database object
-//where the 1 is is the paramater argument which can be 
-// an array that holds multiple values
-// db.run('DELETE FROM candidates WHERE id = ?', 1, function(err, result) {
-//   if (err) {
-//     console.log(err);
-//   } else {
-//     console.log("\x1b[31m", "Deleting a candidate", "\x1b[00m");
-//     console.log(this.sql);
-//     //this will be the statement object which contains
-//     // lastID which is the primary key ID that was inserted,
-//     // if it was 0 there was no insertion
-//     console.log(this);
-//     //result is undefined because .run() doesn't return any result data
-//     //console.log(result);
-//     console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
-//     console.log(this.changes);
-//   }
-// });
 
+//DELETE route from server to database
+app.delete('/api/candidate/:id', (req, res) => {
+  const sqlDeleteQ = `DELETE FROM candidates WHERE id = ?`;
+  const params = [req.params.id];
+  //DELETE a candidate
+  //using es5 function so we can make this refer to the database object
+  //where the 1 is is the paramater argument which can be 
+  // an array that holds multiple values
+  db.run(sqlDeleteQ, params, function(err, result) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    } else {
+      res.json({
+        message: 'Delete Success',
+        changes: this.changes
+      });
+      console.log("\x1b[31m", "Deleting a candidate", "\x1b[00m");
+      console.log(this.sql);
+      //this will be the statement object which contains
+      // lastID which is the primary key ID that was inserted,
+      // if it was 0 there was no insertion
+      console.log(this);
+      //result is undefined because .run() doesn't return any result data
+      //console.log(result);
+      console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
+      console.log(this.changes);
+    }
+  });
+});
+  
 //create a candidate
 const sqlCreateQ = `INSERT INTO candidates (id, first_name, last_name, industry_connected) VALUES (?,?,?,?)`;
 //these params will fill in the ?'s in the sql query
