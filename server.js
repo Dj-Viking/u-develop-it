@@ -1,6 +1,7 @@
 const express = require('express');
 const PORT = process.env.PORT || 3001;
 const app = express();
+const inputCheck = require('./utils/inputCheck.js');
 //verbose will produce messages in terminal regarding the state of the runtime.
 // this can help explain what sqlite is doing
 const sqlite3 = require('sqlite3').verbose();
@@ -44,7 +45,7 @@ app.get('/api/candidate/:id', (req, res) => {
       return;
     } else {
       res.json({
-        message: 'success',
+        message: 'Search Success',
         data: row
       });
     }
@@ -85,30 +86,43 @@ app.delete('/api/candidate/:id', (req, res) => {
 });
   
 //create a candidate
-const sqlCreateQ = `INSERT INTO candidates (id, first_name, last_name, industry_connected) VALUES (?,?,?,?)`;
-//these params will fill in the ?'s in the sql query
-const params = [1, 'Ronald', 'Firbank', 1];
-//ES5 function for use of "this" keyword
-// db.run(sqlCreateQ, params, function(err, result) {
-//   if (err) {
-//     console.log(err);
-//   } else {
-//     console.log("\x1b[31m", "Adding a candidate", "\x1b[00m");
-//     console.log(this.sql);
-//     console.log(this);
-//     console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
-//     console.log(this.changes)
-//   }
-// });
-
-//if we try to add an entry with the same id
-// the SQL CONSTRAINT will protect the table from getting duplicate ids
-
-// GET all candidates and respond with JSON object of candidates array 
-//all method runs the SQL query and executes the callback with 
-// all the resulting rows that match the query
-app.get('/api/candidates', (req, res) => {
-  const sqlGetQ = `SELECT * FROM candidates`;
+//can destructure body from the req object here
+app.post('/api/candidate', ({ body }, res) => {
+  const errors = inputCheck(body, 'first_name', 'last_name', 'industry_connected');
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+  const sqlCreateQ = `INSERT INTO candidates (first_name, last_name, industry_connected) VALUES (?,?,?)`;
+  //these params will fill in the ?'s in the sql query
+  const params = [body.first_name, body.last_name, body.industry_connected];
+  //ES5 function for use of "this" keyword
+  db.run(sqlCreateQ, params, function(err, result) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.json({
+        message: 'Create Success',
+        data: body,
+        id: this.lastID
+      });
+      console.log("\x1b[31m", "Client adding a candidate", "\x1b[00m");
+      console.log(this.sql);
+      console.log(this);
+      console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
+      console.log(this.changes)
+    }
+  });
+});
+        
+        //if we try to add an entry with the same id
+        // the SQL CONSTRAINT will protect the table from getting duplicate ids
+        
+        // GET all candidates and respond with JSON object of candidates array 
+        //all method runs the SQL query and executes the callback with 
+        // all the resulting rows that match the query
+        app.get('/api/candidates', (req, res) => {
+          const sqlGetQ = `SELECT * FROM candidates`;
   //necesarry argument but since we are displaying all
   // we just pass in a blank array for the params argument
   const params = [];
@@ -118,7 +132,7 @@ app.get('/api/candidates', (req, res) => {
       return;
     } else {
       res.json({
-        message: 'success',
+        message: 'Search Success',
         data: rows
       });
     }
