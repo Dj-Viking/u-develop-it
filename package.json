@@ -4,7 +4,11 @@
   "description": "## Readme coming soon!",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "nodemon server.js",
+    "migrate": "sqlite3 db/election.db < db/schema.sql",
+    "seed": "sqlite3 db/election.db < db/seeds.sql",
+    "db": "sqlite3 db/election.db"
   },
   "repository": {
     "type": "git",
@@ -24,5 +28,9 @@
   "homepage": "https://github.com/Dj-Viking/u-develop-it#readme",
   "devDependencies": {
     "jest": "^26.4.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "sqlite3": "^5.0.0"
   }
 }
