@@ -2,6 +2,7 @@ const express = require('express');
 const PORT = process.env.PORT || 3001;
 const app = express();
 const inputCheck = require('./utils/inputCheck.js');
+const { Statement } = require('sqlite3');
 //verbose will produce messages in terminal regarding the state of the runtime.
 // this can help explain what sqlite is doing
 const sqlite3 = require('sqlite3').verbose();
@@ -27,23 +28,52 @@ db.on('open', () => {
     console.log("\x1b[32m", `Server running now on port ${PORT}!`, "\x1b[00m");
   });
 });
+
 app.get('/', (req, res) => {
   res.json({
     message: "Hello World"
   });
 });
 
+// GET all candidates and respond with JSON object of candidates array 
+//all method runs the SQL query and executes the callback with 
+// all the resulting rows that match the query
+app.get('/api/candidates', (req, res) => {
+  const sqlGetAllQ = `SELECT candidates.*, parties.name AS party_name FROM candidates LEFT JOIN parties ON candidates.party_id = parties.id`;
+  //necesarry argument but since we are displaying all
+  // we just pass in a blank array for the params argument
+  const params = [];
+  db.all(sqlGetAllQ, params, function(err, rows) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    } else {
+      console.log("\x1b[33m", "SQL query to the database", "\x1b[00m");
+      console.log(this.sql);
+      res.json({
+        message: 'Search Success',
+        data: rows
+      });
+    }
+    console.log("\x1b[33m", "responding to client the rows array of candidate objects", "\x1b[00m");
+    console.log(rows);
+  });
+});
+
 // GET a single candidate
 app.get('/api/candidate/:id', (req, res) => {
-  const sqlGetCandidate = `SELECT * FROM candidates WHERE id = ?`;
+  const sqlGetCandidate = `SELECT candidates.*, parties.name AS party_name FROM candidates LEFT JOIN parties ON candidates.party_id = parties.id WHERE candidates.id = ?`;
   const params = [req.params.id];
+  console.log("\x1b[33m", "showing the client URL query itself sent by client", "\x1b[00m");
   console.log(req.params);
 
-  db.get(sqlGetCandidate, params, (err, row) => {
+  db.get(sqlGetCandidate, params, function(err, row) {
     if (err) {
       res.status(400).json({ error: err.message });
       return;
     } else {
+      console.log("\x1b[33m", "SQL query to the database", "\x1b[00m");
+      console.log(this.sql);
       res.json({
         message: 'Search Success',
         data: row
@@ -86,6 +116,8 @@ app.delete('/api/candidate/:id', (req, res) => {
 });
   
 //create a candidate
+//if we try to add an entry with the same id
+// the SQL CONSTRAINT will protect the table from getting duplicate ids
 //can destructure body from the req object here
 app.post('/api/candidate', ({ body }, res) => {
   const errors = inputCheck(body, 'first_name', 'last_name', 'industry_connected');
@@ -112,32 +144,6 @@ app.post('/api/candidate', ({ body }, res) => {
       console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
       console.log(this.changes)
     }
-  });
-});
-        
-        //if we try to add an entry with the same id
-        // the SQL CONSTRAINT will protect the table from getting duplicate ids
-        
-        // GET all candidates and respond with JSON object of candidates array 
-        //all method runs the SQL query and executes the callback with 
-        // all the resulting rows that match the query
-        app.get('/api/candidates', (req, res) => {
-          const sqlGetQ = `SELECT * FROM candidates`;
-  //necesarry argument but since we are displaying all
-  // we just pass in a blank array for the params argument
-  const params = [];
-  db.all(sqlGetQ, params, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    } else {
-      res.json({
-        message: 'Search Success',
-        data: rows
-      });
-    }
-    console.log("\x1b[33m", "sending to client the rows array of candidate objects", "\x1b[00m");
-    console.log(rows);
   });
 });
   
