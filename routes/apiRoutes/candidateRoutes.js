@@ -82,7 +82,7 @@ router.post('/candidate', (req, res) => {
       console.log(this.sql);
       console.log(this);
       console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
-      console.log(this.changes)
+      console.log(this.changes);
     }
   });
 });
@@ -116,7 +116,7 @@ router.put('/candidate/:id', (req, res) => {
     console.log(this.sql);
     console.log(this);
     console.log("\x1b[31m", "Number of changes executed.", "\x1b[00m");
-    console.log(this.changes)
+    console.log(this.changes);
   });
 });
 
