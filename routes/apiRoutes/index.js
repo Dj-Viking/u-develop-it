@@ -10,4 +10,7 @@ router.use(require('./partyRoutes.js'));
 //routing the api to voterRoutes
 router.use(require('./voterRoutes.js'));
 
+//routing the api to voteRoutes
+router.use(require('./voteRoutes.js'));
+
 module.exports = router;

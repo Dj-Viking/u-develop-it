@@ -1,6 +1,4 @@
 const sqlite3 = require('sqlite3').verbose();
-const { Statement } = require('sqlite3');
-
 
 //following the express.json middle ware we will place the middleware for
 // the server to connect to the database

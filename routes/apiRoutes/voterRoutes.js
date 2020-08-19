@@ -50,18 +50,25 @@ router.get('/voter/:id', (req, res) => {
 router.post('/voter', (req, res) => {
   const errors = inputCheck(req.body, 'first_name', 'last_name', 'email');
   if (errors) {
-    res.status(400).json({error: errors});
+    res.status(400).json({
+      error: errors
+    });
     return;
   }
 
-  const sql = `INSERT INTO voters (first_name, last_name, email) VALUES (?,?,?)`;
+  const sql = `
+    INSERT INTO voters (first_name, last_name, email) 
+    VALUES (?,?,?)
+  `;
   const params = [req.body.first_name, req.body.last_name, req.body.email];
   console.log("\x1b[33m", "showing the client URL query itself sent by client", "\x1b[00m");
   console.log(req.body);
   console.log(req.params);
   db.run(sql, params, function(err, result) {
     if (err) {
-      res.status(400).json({error: err.message});
+      res.status(400).json({
+        error: err.message
+      });
       return;
     } else {
       res.json({
