@@ -35,7 +35,7 @@ To reset the database run the commands
 
 ## Usage
 
-screenshots here of insomnia
+screenshots here of insomnia coming soon!
 
 ## Credits
 
