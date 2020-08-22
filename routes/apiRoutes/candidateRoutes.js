@@ -7,7 +7,11 @@ const inputCheck = require('../../utils/inputCheck.js');
 //all method runs the SQL query and executes the callback with 
 // all the resulting rows that match the query
 router.get('/candidates', (req, res) => {
-  const sqlGetAllQ = `SELECT candidates.*, parties.name AS party_name FROM candidates LEFT JOIN parties ON candidates.party_id = parties.id`;
+  const sqlGetAllQ = `
+  SELECT candidates.*, parties.name AS party_name 
+  FROM candidates 
+  LEFT JOIN parties ON candidates.party_id = parties.id
+  `;
   //necesarry argument but since we are displaying all
   // we just pass in a blank array for the params argument
   const params = [];
@@ -62,7 +66,11 @@ router.post('/candidate', (req, res) => {
     res.status(400).json({ error: errors });
     return;
   }
-  const sqlCreateQ = `INSERT INTO candidates (first_name, last_name, industry_connected) VALUES (?,?,?)`;
+  const sqlCreateQ = `
+  INSERT INTO candidates 
+    (first_name, last_name, industry_connected) 
+    VALUES (?,?,?)
+  `;
   //these params will fill in the ?'s in the sql query
   const params = [req.body.first_name, req.body.last_name, req.body.industry_connected];
   console.log("\x1b[33m", "showing the client URL query itself sent by client", "\x1b[00m");
@@ -95,7 +103,11 @@ router.put('/candidate/:id', (req, res) => {
     res.status(400).json({error: errors});
     return;
   }
-  const sql = `UPDATE candidates SET party_id = ? WHERE id = ?`;
+  const sql = `
+  UPDATE candidates 
+    SET party_id = ? 
+    WHERE id = ?
+  `;
   const params = [req.body.party_id, req.params.id];
   console.log("\x1b[33m", "showing the client URL query itself sent by client", "\x1b[00m");
   console.log(req.body);
